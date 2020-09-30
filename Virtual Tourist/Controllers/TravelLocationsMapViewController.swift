@@ -12,6 +12,26 @@ import CoreData
 class TravelLocationsMapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
+    var locations: [NSManagedObject] = []
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let managedCotext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Location")
+        
+        do {
+            locations = try managedCotext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not retrieve data. \(error), \(error.userInfo)")
+        }
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,21 +40,46 @@ class TravelLocationsMapViewController: UIViewController {
         mapView.addGestureRecognizer(longTapGesture)
     }
     
+    
     @objc func longTap(sender: UIGestureRecognizer) {
         print("Long tap")
         if sender.state == .began {
             let locationInView = sender.location(in: mapView)
             let locationOnMap = mapView.convert(locationInView, toCoordinateFrom: mapView)
-            addAnnotation(location: locationOnMap)
+            let longitude = locationOnMap.longitude
+            let latitude = locationOnMap.latitude
+            self.save(longitude: longitude, latitude: latitude)
         }
     }
     
-    func addAnnotation(location: CLLocationCoordinate2D) {
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = location
-        mapView.addAnnotation(annotation)
+    func addAnnotation(longitude: CLLocationDegrees, latitude: CLLocationDegrees) {
+        for location in locations {
+            let annotation = MKPointAnnotation()
+            let location = CLLocationCoordinate2D(latitude: (location.value(forKeyPath: "latitude") as? CLLocationDegrees)!, longitude: (location.value(forKeyPath: "longitude") as? CLLocationDegrees)!)
+            annotation.coordinate = location
+            mapView.addAnnotation(annotation)
+        }
     }
-
+    
+    func save(longitude: Double, latitude: Double) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Location", in: managedContext)!
+        let newLocation = NSManagedObject(entity: entity, insertInto: managedContext)
+        newLocation.setValue(longitude, forKey: "longitude")
+        newLocation.setValue(latitude, forKey: "latitude")
+        
+        do {
+            try? managedContext.save()
+            locations.append(newLocation)
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
+    
 }
 
 
@@ -56,11 +101,12 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             pinView?.rightCalloutAccessoryView = UIButton(type: .infoDark)
             pinView?.pinTintColor = .red
         } else {
-            pinView?.annotation = annotation
+                pinView?.annotation = annotation
         }
         
         return pinView
     }
+    
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         // TODO: SHOW PHOTO COLLECTION
