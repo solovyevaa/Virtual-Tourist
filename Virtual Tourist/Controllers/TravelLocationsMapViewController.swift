@@ -22,15 +22,25 @@ class TravelLocationsMapViewController: UIViewController {
             return
         }
         
-        let managedCotext = appDelegate.persistentContainer.viewContext
+        let managedContext = appDelegate.persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Location")
         
         do {
-            locations = try managedCotext.fetch(fetchRequest)
+            locations = try managedContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Could not retrieve data. \(error), \(error.userInfo)")
         }
         
+        for location in locations {
+            let annotation = MKPointAnnotation()
+            let latitude = location.value(forKey: "latitude") as? Double
+            let longitude = location.value(forKey: "longitude") as? Double
+            
+            if let latitude = latitude, let longitude = longitude {
+                annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            }
+            mapView.addAnnotation(annotation)
+        }
     }
     
     override func viewDidLoad() {
@@ -49,15 +59,6 @@ class TravelLocationsMapViewController: UIViewController {
             let longitude = locationOnMap.longitude
             let latitude = locationOnMap.latitude
             self.save(longitude: longitude, latitude: latitude)
-        }
-    }
-    
-    func addAnnotation(longitude: CLLocationDegrees, latitude: CLLocationDegrees) {
-        for location in locations {
-            let annotation = MKPointAnnotation()
-            let location = CLLocationCoordinate2D(latitude: (location.value(forKeyPath: "latitude") as? CLLocationDegrees)!, longitude: (location.value(forKeyPath: "longitude") as? CLLocationDegrees)!)
-            annotation.coordinate = location
-            mapView.addAnnotation(annotation)
         }
     }
     
@@ -109,7 +110,8 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        // TODO: SHOW PHOTO COLLECTION
+        let controller = storyboard?.instantiateViewController(identifier: "CollectionViewController") as! CollectionViewController
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
