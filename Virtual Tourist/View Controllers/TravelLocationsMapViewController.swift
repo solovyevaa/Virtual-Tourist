@@ -59,14 +59,15 @@ extension TravelLocationsMapViewController {
             let latitude = location.value(forKey: "latitude") as? Double
             let longitude = location.value(forKey: "longitude") as? Double
             
+            // MARK: Getting photos from Flickr
             VirtualTouristAPI.getPhotos(latitude: latitude!, longitude: longitude!) { (data, error) in
-                if let error = error {
-                    print("Request failed: \(error.localizedDescription)")
+                if let data = data {
+                    print("Successful Request")
                 } else {
-                    print("Succeful Request")
+                    print("Request failed: \(error?.localizedDescription)")
                 }
             } ifNoPhotosDo: {
-                print("No photos")
+                print("No Photos")
             }
 
             
@@ -148,20 +149,6 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         // TODO: IMPLEMENT RIGHT SIDE BUTTON
-    }
-    
-}
-
-
-extension TravelLocationsMapViewController {
-    
-    // MARK: Handle Requests
-    func handleRequestTokenResponse(success: Bool, error: Error?) {
-        if success {
-            print("Request is successful")
-        } else {
-            print("Request failed")
-        }
     }
     
 }

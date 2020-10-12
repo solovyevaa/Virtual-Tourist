@@ -7,7 +7,6 @@
 
 import UIKit
 import CoreData
-import OAuthSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

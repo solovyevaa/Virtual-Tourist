@@ -6,20 +6,10 @@
 //
 
 import UIKit
-import OAuthSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
-    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-            guard let url = URLContexts.first?.url else {
-                return
-            }
-            if url.host == "oauth-callback" {
-                OAuthSwift.handle(url: url)
-            }
-    }
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.

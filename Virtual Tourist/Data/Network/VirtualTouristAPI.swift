@@ -2,54 +2,42 @@
 //  VirtualTouristAPI.swift
 //  Virtual Tourist
 //
-//  Created by Anna Solovyeva on 11/10/2020.
+//  Created by Anna Solovyeva on 12/10/2020.
 //
 
 import Foundation
 import MapKit
-import OAuthSwift
 
 class VirtualTouristAPI {
     
-    static let apiKey = "9a7fc6d36783c384"
-    static let apiSecret = "9a7fc6d36783c384"
+    // MARK: Initializing URL Request
+    static let apiKey = "8b0c98378081f676a699ffcd9b3896da"
     
     enum Endpoints {
         static let base = "https://api.flickr.com/services/rest/"
-        static let oAuthBase = "https://www.flickr.com/services/oauth/request_token"
+        static let method = "?method=flickr.photos.search"
         static let apiKeyParam = "&api_key=\(VirtualTouristAPI.apiKey)"
-        static let latParam = "&lat="
-        static let lonParam = "&lon="
-        static let perPageParam = "&per_page="
-        static let oauthNonce = "?oauth_nonce="
-        static let oauthTimestamp = "&oauth_timestamp="
-        static let oauthConsumerKey = "&oauth_consumer_key="
-        static let oauthSignatureMethod = "&oauth_signature_method="
-        static let oauthVersion = "&oauth_version=2.1.0"
-        static let oauthSignature = "&oauth_signature="
-        static let oauthCallback = "&oauth_callback="
+        static let lat = "&lat="
+        static let lon = "&lon="
+        static let perPage = "&per_page="
         
-        case searchPhotos (perPage: String, latitude: Double, longitude: Double)
+        case searchPhotos(latitude: Double, longitude: Double, perPage: String)
+        
+        var stringValue: String {
+            switch self {
+            case .searchPhotos(latitude: let latitude, longitude: let longitude, perPage: let perPage):
+                let coordinates = Endpoints.lat + String(latitude) + Endpoints.lon + String(longitude)
+                return Endpoints.base + Endpoints.method + Endpoints.apiKeyParam + coordinates + Endpoints.perPage + perPage + "&format=json&nojsoncallback=1"
+            }
+        }
         
         var url: URL {
             return URL(string: stringValue)!
         }
-        
-        var stringValue: String {
-            switch self {
-            case .searchPhotos (let perPage, let latitude, let longitude):
-                let coordinates = Endpoints.latParam + String(latitude) + Endpoints.lonParam + String(longitude)
-                return Endpoints.base + "?method=flickr.photos.search" + Endpoints.apiKeyParam + coordinates + Endpoints.perPageParam + perPage + "&format=json&nojsoncallback=1"
-            }
-        }
     }
     
-}
-
-
-extension VirtualTouristAPI {
     
-    // MARK: Task for GET request
+    // MARK: Task for GET Request
     class func taskForGETRequest<ResponseType: Decodable>(url: URL, responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) -> URLSessionDataTask {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
@@ -66,7 +54,7 @@ extension VirtualTouristAPI {
                 }
             } catch {
                 do {
-                    let errorResponse = try decoder.decode(VirtualTouristResponse.self, from: data) as Error
+                    let errorResponse = try decoder.decode(FlickrGeneralResponse.self, from: data) as Error
                     DispatchQueue.main.async {
                         completion(nil, errorResponse)
                     }
@@ -83,12 +71,14 @@ extension VirtualTouristAPI {
     }
     
     
-    // MARK: Get Photos
+    // MARK: Getting photos from Flickr
     class func getPhotos(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completion: @escaping (Data?, Error?) -> Void, ifNoPhotosDo: ((() -> Void))?) {
-        let url = Endpoints.searchPhotos(perPage: "30", latitude: latitude, longitude: longitude).url
+        
+        let url = Endpoints.searchPhotos(latitude: latitude, longitude: longitude, perPage: "30").url
         print(url)
         
-        taskForGETRequest(url: url, responseType: PhotosResponse.self) { (response, error) in
+        taskForGETRequest(url: url, responseType: FlickrGetPhotosResponse.self) { (response, error) in
+            
             if let response = response {
                 let photoList = response.photos.photo
                 
@@ -108,23 +98,31 @@ extension VirtualTouristAPI {
                         }
                     }
                 }
+                
             } else {
                 completion(nil, error)
             }
+            
         }
+        
     }
     
     
     class func getImageData(url: URL, completion: @escaping (Data?, Error?) -> Void) {
-            print(url)
-            let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-                guard let data = data else {
-                    completion(nil, error)
-                    return
-                }
-                completion(data, nil)
+        print(url)
+        // sending GET request with URL
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            // Verifiying data was recieved
+            guard let data = data else {
+                // Error occured
+                completion(nil, error)
+                return
             }
-            task.resume()
+            // Cakking completion method with data
+            completion(data, nil)
         }
+        // Initiating the GET Request task
+        task.resume()
+    }
     
 }
