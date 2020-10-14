@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="20A5384c" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Collection" representedClassName="Collection" syncable="YES" codeGenerationType="class">
+        <attribute name="photo" optional="YES" attributeType="Binary"/>
+        <relationship name="location" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="collections" inverseEntity="Location"/>
+    </entity>
     <entity name="Location" representedClassName="Location" syncable="YES" codeGenerationType="class">
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="collections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Collection" inverseName="location" inverseEntity="Collection"/>
     </entity>
     <elements>
-        <element name="Location" positionX="-3548.243103027344" positionY="2974.093872070312" width="128" height="73"/>
+        <element name="Location" positionX="-2461.857666015625" positionY="4370.762054443359" width="128" height="88"/>
+        <element name="Collection" positionX="-2262.284912109375" positionY="4371.605133056641" width="128" height="73"/>
     </elements>
 </model>

@@ -9,20 +9,28 @@ import UIKit
 import MapKit
 import CoreData
 
-class TravelLocationsMapViewController: UIViewController {
+class TravelLocationsMapViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     // MARK: Initialiazaing of variables
     @IBOutlet weak var mapView: MKMapView!
+    var fetchedResultsController: NSFetchedResultsController<Collection>!
     var locations: [Location] = []
+    var location: Location!
     
     
     // MARK: UIView
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        mapView.delegate = self
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap))
         mapView.addGestureRecognizer(longTapGesture)
+        
+        guard let appDelegate =
+          UIApplication.shared.delegate as? AppDelegate else {
+          return
+        }
+        setUpFetchRequest(appDelegate)
+        setUpFetchedResultsController(appDelegate)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -33,10 +41,12 @@ class TravelLocationsMapViewController: UIViewController {
           return
         }
         setUpFetchRequest(appDelegate)
+        setUpFetchedResultsController(appDelegate)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        fetchedResultsController = nil
     }
 
 }
@@ -62,7 +72,7 @@ extension TravelLocationsMapViewController {
             // MARK: Getting photos from Flickr
             VirtualTouristAPI.getPhotos(latitude: latitude!, longitude: longitude!) { (data, error) in
                 if let data = data {
-                    print("Successful Request")
+                    self.savePhotos(data: data as NSData)
                 } else {
                     print("Request failed: \(error?.localizedDescription)")
                 }
@@ -73,8 +83,28 @@ extension TravelLocationsMapViewController {
             
             if let latitude = latitude, let longitude = longitude {
                 annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                annotation.title = "Collection of photos"
             }
             mapView.addAnnotation(annotation)
+        }
+    }
+    
+    
+    // MARK: Setting up FetchedResultsController
+    fileprivate func setUpFetchedResultsController(_ appDelegate: AppDelegate) {
+        let fetchRequest: NSFetchRequest<Collection> = Collection.fetchRequest()
+        //let predicate = NSPredicate(format: "location == %@", location)
+        //fetchRequest.predicate = predicate
+        let sortDescriptor = NSSortDescriptor(key: "photo", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: appDelegate.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("Cannot perform fetch: \(error.localizedDescription)")
         }
     }
     
@@ -102,6 +132,30 @@ extension TravelLocationsMapViewController {
         print("Could not save. \(error), \(error.userInfo)")
       }
     }
+    
+    
+    // MARK: Saving photos to Persistent Container
+    func savePhotos(data: NSData) {
+        
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+            return
+            }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Collection", in: managedContext)!
+        let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
+        
+        nPhoto.setValue(data, forKeyPath: "photo")
+        
+        do {
+            try managedContext.save()
+        } catch {
+            fatalError("Could not save: \(error.localizedDescription)")
+        }
+    }
+
+    
 }
 
 
@@ -120,35 +174,25 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        guard annotation is MKPointAnnotation else {
-            print("MKPointannotation doesn't exist")
-            return nil
+            let reuseId = "pin"
+            var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+
+            if pinView == nil {
+                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+                pinView!.canShowCallout = true
+                pinView!.pinTintColor = .red
+                pinView!.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+            }
+            else {
+                pinView!.annotation = annotation
+            }
+            
+            return pinView
         }
-            
-        let reuseId = "pin"
-        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-            
-        if pinView == nil {
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView?.canShowCallout = true
-            // TODO: CHANGE PIN VIEW TO SHOW COLLECTION OF PHOTOS
-            pinView?.rightCalloutAccessoryView = UIButton(type: .infoDark)
-            pinView?.pinTintColor = .red
-        } else {
-            pinView?.annotation = annotation
-        }
-            
-        return pinView
-    }
-        
-        
-    /*func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        let controller = storyboard?.instantiateViewController(identifier: "CollectionViewController") as! CollectionViewController
-        self.navigationController?.pushViewController(controller, animated: true)
-    }*/
-        
-    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        // TODO: IMPLEMENT RIGHT SIDE BUTTON
+    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        let controller = storyboard?.instantiateViewController(withIdentifier: "PhotoCollectionViewController") as! PhotoCollectionViewController
+        present(controller, animated: true, completion: nil)
     }
     
 }
