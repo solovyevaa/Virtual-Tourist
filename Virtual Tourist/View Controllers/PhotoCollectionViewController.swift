@@ -13,8 +13,10 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     // MARK: Initializing of variables
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var okButton: UIBarButtonItem!
+    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     var fetchedResultsController: NSFetchedResultsController<Collection>!
-    var location: Location!
+    var locations: [Location] = []
     
     
     // MARK: UIView
@@ -26,6 +28,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
           return
         }
         setUpFetchedResultsController(appDelegate)
+        
+        newCollectionButton.isEnabled = false
     }
     
     override func viewDidLoad() {
@@ -41,6 +45,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         fetchedResultsController = nil
+        
     }
     
     
@@ -64,6 +69,11 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
         let fetchRequest: NSFetchRequest<Collection> = Collection.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "photo", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        for location in locations {
+            let predicate = NSPredicate(format: "location == %@", location)
+            fetchRequest.predicate = predicate
+        }
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: appDelegate.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self

@@ -15,7 +15,6 @@ class TravelLocationsMapViewController: UIViewController, NSFetchedResultsContro
     @IBOutlet weak var mapView: MKMapView!
     var fetchedResultsController: NSFetchedResultsController<Collection>!
     var locations: [Location] = []
-    var location: Location!
     
     
     // MARK: UIView
@@ -93,10 +92,13 @@ extension TravelLocationsMapViewController {
     // MARK: Setting up FetchedResultsController
     fileprivate func setUpFetchedResultsController(_ appDelegate: AppDelegate) {
         let fetchRequest: NSFetchRequest<Collection> = Collection.fetchRequest()
-        //let predicate = NSPredicate(format: "location == %@", location)
-        //fetchRequest.predicate = predicate
         let sortDescriptor = NSSortDescriptor(key: "photo", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        for location in locations {
+            let predicate = NSPredicate(format: "location == %@", location)
+            fetchRequest.predicate = predicate
+        }
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: appDelegate.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
@@ -191,6 +193,14 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         let controller = storyboard?.instantiateViewController(withIdentifier: "PhotoCollectionViewController") as! PhotoCollectionViewController
         present(controller, animated: true, completion: nil)
+    }
+    
+    
+    // MARK: Prepare for segue
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? PhotoCollectionViewController {
+            vc.locations = locations
+        }
     }
     
 }

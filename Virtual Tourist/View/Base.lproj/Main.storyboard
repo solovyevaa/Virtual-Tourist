@@ -101,7 +101,7 @@
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rLp-Mo-K26">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                 <items>
-                                    <navigationItem title="Title" id="mpP-oR-rE6">
+                                    <navigationItem title="Virtual Tourist" id="mpP-oR-rE6">
                                         <barButtonItem key="leftBarButtonItem" title="OK" id="yhz-Pz-c3r">
                                             <connections>
                                                 <action selector="okPressedWithSender:" destination="9xr-5y-Quz" id="2wl-IP-fNv"/>
@@ -130,6 +130,8 @@
                     <connections>
                         <outlet property="collectionView" destination="AdA-Jk-IpZ" id="mUX-Mv-zcK"/>
                         <outlet property="flowLayout" destination="nbN-16-5as" id="BgI-lp-9op"/>
+                        <outlet property="newCollectionButton" destination="2CL-We-uwg" id="kGx-QY-bMX"/>
+                        <outlet property="okButton" destination="yhz-Pz-c3r" id="Njs-xt-0q4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pey-Dz-hLO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
