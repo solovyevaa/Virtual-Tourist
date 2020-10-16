@@ -73,7 +73,7 @@ extension TravelLocationsMapViewController {
                 if let data = data {
                     self.savePhotos(data: data as NSData)
                 } else {
-                    print("Request failed: \(error?.localizedDescription)")
+                    fatalError("Cannot save photos: \(error?.localizedDescription ?? "unknown error")")
                 }
             } ifNoPhotosDo: {
                 print("No Photos")
@@ -198,8 +198,13 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     // MARK: Prepare for segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        //guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        
         if let vc = segue.destination as? PhotoCollectionViewController {
             vc.locations = locations
+            vc.fetchedResultsController = fetchedResultsController
+            
         }
     }
     

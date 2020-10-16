@@ -23,13 +23,10 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard let appDelegate =
-          UIApplication.shared.delegate as? AppDelegate else {
-          return
-        }
-        setUpFetchedResultsController(appDelegate)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         
-        newCollectionButton.isEnabled = false
+        setUpFetchedResultsController(appDelegate)
+        print("This is fetchedResultsController: \(fetchedResultsController)")
     }
     
     override func viewDidLoad() {
@@ -51,7 +48,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDelegate,
     
     //MARK: IBActions
     @IBAction func newCollection(sender: Any) {
-        
+        deleteAllPhotos()
+        collectionView.reloadData()
     }
     
     @IBAction func okPressed(sender: Any) {
@@ -103,6 +101,10 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
 extension PhotoCollectionViewController: UICollectionViewDelegateFlowLayout {
     
     // MARK: Collection View
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return fetchedResultsController.sections?.count ?? 1
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
@@ -138,5 +140,82 @@ extension PhotoCollectionViewController: UICollectionViewDelegateFlowLayout {
         let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
         return sectionInsets.left
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        deletePhoto(at: indexPath)
+    }
+    
+}
+
+
+extension PhotoCollectionViewController {
+    
+    // MARK: Saving photos into Persistent Container
+    func savePhotos(data: NSData) {
+        
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+            return
+            }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Collection", in: managedContext)!
+        let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
+        
+        nPhoto.setValue(data, forKeyPath: "photo")
+        
+        do {
+            try managedContext.save()
+        } catch {
+            fatalError("Could not save: \(error.localizedDescription)")
+        }
+    }
+    
+}
+
+extension PhotoCollectionViewController {
+    
+    // MARK: Deleting of photos
+    func deletePhoto(at indexPath: IndexPath) {
+        
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+            return
+            }
+        
+        let photoToDelete = fetchedResultsController.object(at: indexPath)
+        appDelegate.persistentContainer.viewContext.delete(photoToDelete)
+        
+        do {
+            try appDelegate.persistentContainer.viewContext.save()
+        } catch {
+            fatalError("Cannot delete photos: \(error.localizedDescription)")
+        }
+        
+    }
+    
+    func deleteAllPhotos() {
+        
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+            return
+            }
+        
+        let photos = self.fetchedResultsController.fetchedObjects!
+        
+        for photo in photos.reversed() {
+            appDelegate.persistentContainer.viewContext.performAndWait {
+                appDelegate.persistentContainer.viewContext.delete(photo)
+            }
+        }
+        
+        do {
+            try appDelegate.persistentContainer.viewContext.save()
+            
+        } catch {
+            fatalError("Cannot delete photos: \(error.localizedDescription)")
+        }
+    }
+    
     
 }

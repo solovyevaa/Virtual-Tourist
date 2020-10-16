@@ -78,7 +78,6 @@
 			children = (
 				969AD51C2532479E008C434F /* Virtual Tourist */,
 				969AD51B2532479E008C434F /* Products */,
-				96BF203A2533D8EF00C1A8FB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -138,13 +137,6 @@
 				969AD5262532479E008C434F /* Virtual_Tourist.xcdatamodeld */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		96BF203A2533D8EF00C1A8FB /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
