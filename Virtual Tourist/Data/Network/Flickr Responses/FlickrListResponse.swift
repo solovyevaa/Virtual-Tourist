@@ -2,7 +2,7 @@
 //  FlickrListResponse.swift
 //  Virtual Tourist
 //
-//  Created by Anna Solovyeva on 12/10/2020.
+//  Created by Анна Соловьева on 17/10/2020.
 //
 
 import Foundation

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="20A5384c" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Collection" representedClassName="Collection" syncable="YES" codeGenerationType="class">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19H2" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CollectionOfPhotos" representedClassName="CollectionOfPhotos" syncable="YES" codeGenerationType="class">
         <attribute name="photo" optional="YES" attributeType="Binary"/>
-        <relationship name="location" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="collections" inverseEntity="Location"/>
+        <relationship name="pin" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Pin" inverseName="collection" inverseEntity="Pin"/>
     </entity>
-    <entity name="Location" representedClassName="Location" syncable="YES" codeGenerationType="class">
+    <entity name="Pin" representedClassName="Pin" syncable="YES" codeGenerationType="class">
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <relationship name="collections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Collection" inverseName="location" inverseEntity="Collection"/>
+        <relationship name="collection" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CollectionOfPhotos" inverseName="pin" inverseEntity="CollectionOfPhotos"/>
     </entity>
     <elements>
-        <element name="Location" positionX="-2461.857666015625" positionY="4370.762054443359" width="128" height="88"/>
-        <element name="Collection" positionX="-2262.284912109375" positionY="4371.605133056641" width="128" height="73"/>
+        <element name="CollectionOfPhotos" positionX="1400.26953125" positionY="1624.609375" width="128" height="73"/>
+        <element name="Pin" positionX="1675.09375" positionY="1609.7890625" width="128" height="88"/>
     </elements>
 </model>
