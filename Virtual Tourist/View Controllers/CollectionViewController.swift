@@ -35,6 +35,8 @@ class CollectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        getNewPhotos()
+        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         setUpFetchedResultsController(appDelegate)
     }
@@ -150,6 +152,7 @@ extension CollectionViewController: NSFetchedResultsControllerDelegate {
             let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
             
             nPhoto.setValue(data, forKeyPath: "photo")
+            nPhoto.setValue(self.pin, forKeyPath: "pin")
         
             do {
                 try managedContext.save()
@@ -189,6 +192,8 @@ extension CollectionViewController {
         VirtualTouristAPI.getPhotos(latitude: pin.latitude, longitude: pin.longitude) { (data, error) in
             if let data = data {
                 self.savePhotos(data: data as NSData)
+            } else {
+                fatalError("Cannot save any photos: \(error?.localizedDescription ?? "unknown error")")
             }
         } ifNoPhotosDo: {
             print("No Photos")

@@ -52,14 +52,6 @@ extension MapViewController: MKMapViewDelegate {
             let latitude = locationOnMap.latitude
             self.savePin(longitude: longitude, latitude: latitude)
             
-            VirtualTouristAPI.getPhotos(latitude: latitude, longitude: longitude) { (data, error) in
-                if let data = data {
-                    self.savePhotos(data: data as NSData)
-                }
-            } ifNoPhotosDo: {
-                print("No Photos")
-            }
-            
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             mapView.addAnnotation(annotation)
@@ -157,6 +149,8 @@ extension MapViewController {
         let entity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
         
         let nPin = NSManagedObject(entity: entity, insertInto: managedContext)
+        
+        pins.append(nPin as! Pin)
         
         nPin.setValue(longitude, forKeyPath: "longitude")
         nPin.setValue(latitude, forKeyPath: "latitude")
