@@ -99,7 +99,11 @@
                                 <rect key="frame" x="0.0" y="771" width="414" height="49"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="LMV-fC-6qn"/>
-                                    <barButtonItem title="New Collection" id="yVX-Mv-9ty"/>
+                                    <barButtonItem title="New Collection" id="yVX-Mv-9ty">
+                                        <connections>
+                                            <action selector="newCollectionPressed:" destination="kFW-J9-0F6" id="SB6-uX-4ex"/>
+                                        </connections>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="z3P-Kb-J4L"/>
                                 </items>
                             </toolbar>

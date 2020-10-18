@@ -13,7 +13,6 @@ class MapViewController: UIViewController {
 
     // MARK: Initializing of variables
     @IBOutlet weak var mapView: MKMapView!
-    var pin: Pin!
     var pins: [Pin] = []
     
     
@@ -36,10 +35,6 @@ class MapViewController: UIViewController {
         setUpPinFetchRequest(appDelegate)
         
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
 
 }
 
@@ -56,6 +51,14 @@ extension MapViewController: MKMapViewDelegate {
             let longitude = locationOnMap.longitude
             let latitude = locationOnMap.latitude
             self.savePin(longitude: longitude, latitude: latitude)
+            
+            VirtualTouristAPI.getPhotos(latitude: latitude, longitude: longitude) { (data, error) in
+                if let data = data {
+                    self.savePhotos(data: data as NSData)
+                }
+            } ifNoPhotosDo: {
+                print("No Photos")
+            }
             
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -140,7 +143,6 @@ extension MapViewController: NSFetchedResultsControllerDelegate {
             }
             mapView.addAnnotation(annotation)
         }
-            
     }
     
 }
@@ -163,6 +165,26 @@ extension MapViewController {
             try managedContext.save()
         } catch {
             fatalError("Cannot save pin: \(error.localizedDescription)")
+        }
+    }
+    
+    
+    // MARK: Saving photos to Persistent Store
+    func savePhotos(data: NSData) {
+        DispatchQueue.main.async {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+            
+            let managedContext = appDelegate.persistentContainer.viewContext
+            let entity = NSEntityDescription.entity(forEntityName: "CollectionOfPhotos", in: managedContext)!
+            let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
+            
+            nPhoto.setValue(data, forKeyPath: "photo")
+        
+            do {
+                try managedContext.save()
+            } catch {
+                fatalError("Could not save: \(error.localizedDescription)")
+            }
         }
     }
     
