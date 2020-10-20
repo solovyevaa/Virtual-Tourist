@@ -64,6 +64,7 @@ extension MapViewController: MKMapViewDelegate {
         
         if pinView == nil {
             pinView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView?.glyphImage = UIImage(imageLiteralResourceName: "icon_pin")
         } else {
             pinView!.annotation = annotation
         }
@@ -83,6 +84,14 @@ extension MapViewController: MKMapViewDelegate {
         } else {
             fatalError("Cannot perform this location.")
         }
+    }
+    
+    
+    func centerMapOnLocation(location: CLLocation) {
+        let regionRadius: CLLocationDistance = 1000
+        
+        let coordinateRegion = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: regionRadius * 2.0, longitudinalMeters: regionRadius * 2.0)
+        mapView.setRegion(coordinateRegion, animated: true)
     }
     
 }
