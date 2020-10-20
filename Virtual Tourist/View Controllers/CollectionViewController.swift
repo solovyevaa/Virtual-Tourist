@@ -15,6 +15,7 @@ class CollectionViewController: UIViewController {
     @IBOutlet weak var okButton: UIBarButtonItem!
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var fetchedResultsController: NSFetchedResultsController<CollectionOfPhotos>!
     var pin: Pin!
     
@@ -34,7 +35,6 @@ class CollectionViewController: UIViewController {
     // MARK: UIView
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         getNewPhotos()
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
@@ -44,12 +44,17 @@ class CollectionViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        activityIndicator.startAnimating()
+        newCollectionButton.isEnabled = false
+        okButton.isEnabled = false
+        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         setUpFetchedResultsController(appDelegate)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        deleteAllPhotos()
         fetchedResultsController = nil
     }
 
@@ -65,10 +70,14 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath) as! PhotoCollectionViewCell
         let photo = fetchedResultsController.object(at: indexPath)
         cell.imageView.image = UIImage(data: photo.photo! as Data)
+        
+        newCollectionButton.isEnabled = true
+        okButton.isEnabled = true
+        activityIndicator.stopAnimating()
+        activityIndicator.isHidden = true
         
         return cell
     }
@@ -78,7 +87,6 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            
             let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
             
             let itemsPerRow: CGFloat = 3
@@ -90,29 +98,25 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
         }
         
         func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-            
             let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0,bottom: 50.0, right: 20.0)
             return sectionInsets
         }
         
         func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-            
             let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
             return sectionInsets.left
         }
+    
 }
 
 
-// MARK: Setting up FetchedResultsController
-
 extension CollectionViewController: NSFetchedResultsControllerDelegate {
     
+    // MARK: Setting up FetchedResultsController
     fileprivate func setUpFetchedResultsController(_ appDelegate: AppDelegate) {
         let fetchRequest: NSFetchRequest<CollectionOfPhotos> = CollectionOfPhotos.fetchRequest()
-        let sortDescriptor = NSSortDescriptor(key: "photo", ascending: false)
-        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.sortDescriptors = []
         
-        // TODO: Implement Predicate
         let predicate = NSPredicate(format: "pin == %@", pin!)
         fetchRequest.predicate = predicate
         
@@ -157,18 +161,18 @@ extension CollectionViewController: NSFetchedResultsControllerDelegate {
             do {
                 try managedContext.save()
             } catch {
-                fatalError("Could not save: \(error.localizedDescription)")
+                fatalError("Cannot save photos: \(error.localizedDescription)")
             }
         }
     }
     
-    
 }
 
 
+// MARK: Getting and Deleting photos
+
 extension CollectionViewController {
     
-    // MARK: Functions to NewCollectionPressed IBAction
     func deleteAllPhotos() {
         if let photosToDelete = self.fetchedResultsController.fetchedObjects {
             for photo in photosToDelete.reversed() {
@@ -184,20 +188,42 @@ extension CollectionViewController {
         do {
             try appDelegate.persistentContainer.viewContext.save()
         } catch {
-            print(error)
+            fatalError("Cannot delete photos: \(error.localizedDescription)")
         }
     }
     
     func getNewPhotos() {
+        okButton.isEnabled = false
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+        
         VirtualTouristAPI.getPhotos(latitude: pin.latitude, longitude: pin.longitude) { (data, error) in
             if let data = data {
                 self.savePhotos(data: data as NSData)
             } else {
-                fatalError("Cannot save any photos: \(error?.localizedDescription ?? "unknown error")")
+                fatalError("Cannot get new photos: \(error?.localizedDescription ?? "unknown error")")
             }
         } ifNoPhotosDo: {
-            print("No Photos")
+            self.showAlert()
         }
+    }
+    
+}
+
+
+extension CollectionViewController {
+    
+    // MARK: UIAlert
+    func showAlert() {
+        let alert = UIAlertController(title: "No Photos", message: "We couldn't find any photos for this location", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+        
+        okButton.isEnabled = true
+        activityIndicator.stopAnimating()
+        activityIndicator.isHidden = true
     }
     
 }

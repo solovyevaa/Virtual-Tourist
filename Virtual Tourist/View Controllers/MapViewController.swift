@@ -25,7 +25,6 @@ class MapViewController: UIViewController {
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         setUpPinFetchRequest(appDelegate)
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -33,7 +32,6 @@ class MapViewController: UIViewController {
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         setUpPinFetchRequest(appDelegate)
-        
     }
 
 }
@@ -51,7 +49,7 @@ extension MapViewController: MKMapViewDelegate {
             let longitude = locationOnMap.longitude
             let latitude = locationOnMap.latitude
             self.savePin(longitude: longitude, latitude: latitude)
-            
+
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             mapView.addAnnotation(annotation)
@@ -66,15 +64,14 @@ extension MapViewController: MKMapViewDelegate {
         
         if pinView == nil {
             pinView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-                
         } else {
             pinView!.annotation = annotation
         }
+        
         return pinView
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        
         let annotation = mapView.selectedAnnotations[0]
         let latitude = annotation.coordinate.latitude
         let longitude = annotation.coordinate.longitude
@@ -86,34 +83,15 @@ extension MapViewController: MKMapViewDelegate {
         } else {
             fatalError("Cannot perform this location.")
         }
-        
-    }
-    
-    
-    // MARK: Getting location by coordinates
-    func getPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin? {
-        for pin in pins {
-            if (pin.latitude == latitude) && (pin.longitude == longitude) {
-                return pin
-            }
-        }
-        return nil
-    }
-    
-    
-    // MARK: Prepare for segue
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let vc = segue.destination as? CollectionViewController {
-            vc.pin = (sender as! Pin)
-        }
     }
     
 }
 
 
+// MARK: Setting up FetchRequest for Pin
+
 extension MapViewController: NSFetchedResultsControllerDelegate {
     
-    // MARK: Setting up Fetch request for Pin
     fileprivate func setUpPinFetchRequest(_ appDelegate: AppDelegate) {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: false)
@@ -163,22 +141,22 @@ extension MapViewController {
     }
     
     
-    // MARK: Saving photos to Persistent Store
-    func savePhotos(data: NSData) {
-        DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-            
-            let managedContext = appDelegate.persistentContainer.viewContext
-            let entity = NSEntityDescription.entity(forEntityName: "CollectionOfPhotos", in: managedContext)!
-            let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
-            
-            nPhoto.setValue(data, forKeyPath: "photo")
-        
-            do {
-                try managedContext.save()
-            } catch {
-                fatalError("Could not save: \(error.localizedDescription)")
+    // MARK: Getting location by coordinates
+    func getPin(latitude: CLLocationDegrees, longitude: CLLocationDegrees) -> Pin? {
+        for pin in pins {
+            if (pin.latitude == latitude) && (pin.longitude == longitude) {
+                return pin
             }
+        }
+        
+        return nil
+    }
+    
+    
+    // MARK: Prepare for segue
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? CollectionViewController {
+            vc.pin = (sender as! Pin)
         }
     }
     

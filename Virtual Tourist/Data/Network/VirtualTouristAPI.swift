@@ -107,21 +107,15 @@ class VirtualTouristAPI {
         
     }
     
-    
     class func getImageData(url: URL, completion: @escaping (Data?, Error?) -> Void) {
         print(url)
-        // sending GET request with URL
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-            // Verifiying data was recieved
             guard let data = data else {
-                // Error occured
                 completion(nil, error)
                 return
             }
-            // Cakking completion method with data
             completion(data, nil)
         }
-        // Initiating the GET Request task
         task.resume()
     }
     
