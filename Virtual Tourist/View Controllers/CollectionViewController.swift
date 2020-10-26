@@ -17,6 +17,7 @@ class CollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var dataController: DataController!
+    var collectionOfPhotos: [NSData] = []
     var fetchedResultsController: NSFetchedResultsController<CollectionOfPhotos>!
     var pin: Pin!
     
@@ -36,7 +37,10 @@ class CollectionViewController: UIViewController {
     // MARK: UIView
     override func viewDidLoad() {
         super.viewDidLoad()
-        //getNewPhotos()
+        
+        for photo in collectionOfPhotos {
+            savePhotos(data: photo)
+        }
         
         setUpFetchedResultsController()
     }
@@ -53,7 +57,6 @@ class CollectionViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        //deleteAllPhotos()
         fetchedResultsController = nil
     }
 
@@ -121,7 +124,6 @@ extension CollectionViewController: NSFetchedResultsControllerDelegate {
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
-        print(fetchedResultsController.fetchedObjects)
         
         do {
             try fetchedResultsController.performFetch()
@@ -156,7 +158,6 @@ extension CollectionViewController: NSFetchedResultsControllerDelegate {
             
             nPhoto.setValue(data, forKeyPath: "photo")
             nPhoto.setValue(self.pin, forKeyPath: "pin")
-            print(managedContext)
         
             do {
                 try managedContext.save()

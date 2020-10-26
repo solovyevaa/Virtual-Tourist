@@ -75,7 +75,7 @@ class VirtualTouristAPI {
     // MARK: Getting photos from Flickr
     class func getPhotos(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completion: @escaping (Data?, Error?) -> Void, ifNoPhotosDo: ((() -> Void))?) {
         
-        let url = Endpoints.searchPhotos(latitude: latitude, longitude: longitude, perPage: "30", page: "\(Int.random(in: 0..<6))").url
+        let url = Endpoints.searchPhotos(latitude: latitude, longitude: longitude, perPage: "30", page: "\(Int.random(in: 0..<10))").url
         print(url)
         
         taskForGETRequest(url: url, responseType: FlickrGetPhotosResponse.self) { (response, error) in

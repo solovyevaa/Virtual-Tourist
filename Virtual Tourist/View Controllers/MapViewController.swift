@@ -15,6 +15,7 @@ class MapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     var dataController: DataController!
     var pins: [Pin] = []
+    var photosForPin: [NSData] = []
     
     
     // MARK: UIView
@@ -48,6 +49,12 @@ extension MapViewController: MKMapViewDelegate {
             let longitude = locationOnMap.longitude
             let latitude = locationOnMap.latitude
             self.savePin(longitude: longitude, latitude: latitude)
+            
+            VirtualTouristAPI.getPhotos(latitude: latitude, longitude: longitude) { (data, error) in
+                self.photosForPin.append(data! as NSData)
+            } ifNoPhotosDo: {
+                self.showAlert()
+            }
 
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -140,40 +147,10 @@ extension MapViewController {
         nPin.setValue(longitude, forKeyPath: "longitude")
         nPin.setValue(latitude, forKeyPath: "latitude")
         
-        VirtualTouristAPI.getPhotos(latitude: latitude, longitude: longitude) { (data, error) in
-            if let data = data {
-                self.savePhotos(data: data as NSData)
-            } else {
-                fatalError("Cannot get new photos: \(error?.localizedDescription ?? "unknown error")")
-            }
-        } ifNoPhotosDo: {
-            print("No Photos")
-        }
-        
         do {
             try managedContext.save()
         } catch {
             fatalError("Cannot save pin: \(error.localizedDescription)")
-        }
-    }
-    
-    
-    // MARK: Saving photos to Persistent Store
-    func savePhotos(data: NSData) {
-        DispatchQueue.main.async {
-            
-            let managedContext = self.dataController.viewContext
-            let entity = NSEntityDescription.entity(forEntityName: "CollectionOfPhotos", in: managedContext)!
-            let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
-            
-            nPhoto.setValue(data, forKeyPath: "photo")
-            print(nPhoto)
-        
-            do {
-                try managedContext.save()
-            } catch {
-                fatalError("Cannot save photos: \(error.localizedDescription)")
-            }
         }
     }
     
@@ -195,7 +172,19 @@ extension MapViewController {
         if let vc = segue.destination as? CollectionViewController {
             vc.pin = (sender as! Pin)
             vc.dataController = dataController
+            vc.collectionOfPhotos = photosForPin
+            photosForPin = []
         }
+    }
+    
+    
+    // MARK: UIAlert
+    func showAlert() {
+        let alert = UIAlertController(title: "No Photos", message: "We couldn't find any photos for this location", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
     
 }
