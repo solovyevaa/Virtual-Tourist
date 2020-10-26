@@ -13,6 +13,7 @@ class MapViewController: UIViewController {
 
     // MARK: Initializing of variables
     @IBOutlet weak var mapView: MKMapView!
+    var dataController: DataController!
     var pins: [Pin] = []
     
     
@@ -23,15 +24,13 @@ class MapViewController: UIViewController {
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap))
         mapView.addGestureRecognizer(longTapGesture)
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        setUpPinFetchRequest(appDelegate)
+        setUpPinFetchRequest()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        setUpPinFetchRequest(appDelegate)
+        setUpPinFetchRequest()
     }
 
 }
@@ -101,13 +100,13 @@ extension MapViewController: MKMapViewDelegate {
 
 extension MapViewController: NSFetchedResultsControllerDelegate {
     
-    fileprivate func setUpPinFetchRequest(_ appDelegate: AppDelegate) {
+    fileprivate func setUpPinFetchRequest() {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         do {
-            try pins = appDelegate.persistentContainer.viewContext.fetch(fetchRequest)
+            try pins = dataController.viewContext.fetch(fetchRequest)
         } catch {
             fatalError("Cannot fetch Pin's data: \(error.localizedDescription)")
         }
@@ -131,8 +130,7 @@ extension MapViewController {
     
     // MARK: Saving pin to Persistent Store
     func savePin(longitude: Double, latitude: Double) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        let managedContext = appDelegate.persistentContainer.viewContext
+        let managedContext = dataController.viewContext
         let entity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
         
         let nPin = NSManagedObject(entity: entity, insertInto: managedContext)
@@ -142,10 +140,40 @@ extension MapViewController {
         nPin.setValue(longitude, forKeyPath: "longitude")
         nPin.setValue(latitude, forKeyPath: "latitude")
         
+        VirtualTouristAPI.getPhotos(latitude: latitude, longitude: longitude) { (data, error) in
+            if let data = data {
+                self.savePhotos(data: data as NSData)
+            } else {
+                fatalError("Cannot get new photos: \(error?.localizedDescription ?? "unknown error")")
+            }
+        } ifNoPhotosDo: {
+            print("No Photos")
+        }
+        
         do {
             try managedContext.save()
         } catch {
             fatalError("Cannot save pin: \(error.localizedDescription)")
+        }
+    }
+    
+    
+    // MARK: Saving photos to Persistent Store
+    func savePhotos(data: NSData) {
+        DispatchQueue.main.async {
+            
+            let managedContext = self.dataController.viewContext
+            let entity = NSEntityDescription.entity(forEntityName: "CollectionOfPhotos", in: managedContext)!
+            let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
+            
+            nPhoto.setValue(data, forKeyPath: "photo")
+            print(nPhoto)
+        
+            do {
+                try managedContext.save()
+            } catch {
+                fatalError("Cannot save photos: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -166,6 +194,7 @@ extension MapViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let vc = segue.destination as? CollectionViewController {
             vc.pin = (sender as! Pin)
+            vc.dataController = dataController
         }
     }
     

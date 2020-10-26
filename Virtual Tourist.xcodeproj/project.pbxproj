@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB0F8C802547568D008317AC /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F8C7F2547568D008317AC /* DataController.swift */; };
 		DB80DF6F253B877200325498 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB80DF6E253B877200325498 /* MapViewController.swift */; };
 		DB80DF72253B87AC00325498 /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB80DF71253B87AC00325498 /* CollectionViewController.swift */; };
 		DB80DF75253B87C700325498 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB80DF74253B87C700325498 /* PhotoCollectionViewCell.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB0F8C7F2547568D008317AC /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		DB80DF6E253B877200325498 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		DB80DF71253B87AC00325498 /* CollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
 		DB80DF74253B87C700325498 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				DBC744B4253A55E200981C10 /* Virtual_Tourist.xcdatamodeld */,
+				DB0F8C7F2547568D008317AC /* DataController.swift */,
 				DBC744DD253A582B00981C10 /* Network */,
 			);
 			path = Data;
@@ -210,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DBC744B6253A55E200981C10 /* Virtual_Tourist.xcdatamodeld in Sources */,
+				DB0F8C802547568D008317AC /* DataController.swift in Sources */,
 				DBC744D9253A580400981C10 /* FlickrListResponse.swift in Sources */,
 				DBC744CD253A576000981C10 /* VirtualTouristAPI.swift in Sources */,
 				DBC744AC253A55E200981C10 /* AppDelegate.swift in Sources */,

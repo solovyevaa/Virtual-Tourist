@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jw9-WD-nE4">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Map View Controller-->
+        <!--Virtual Tourist-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="MapViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -33,6 +33,9 @@
                             <constraint firstItem="ACc-nQ-fOm" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="soG-4R-zig"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="thn-G9-NkS">
+                        <barButtonItem key="backBarButtonItem" title="OK" id="ydc-Hy-Jgx"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="ACc-nQ-fOm" id="7h2-n3-EO2"/>
                         <segue destination="kFW-J9-0F6" kind="show" identifier="segue" id="C7i-0A-lXe"/>
@@ -40,18 +43,18 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-500" y="84"/>
+            <point key="canvasLocation" x="410.14492753623193" y="83.705357142857139"/>
         </scene>
         <!--Collection View Controller-->
         <scene sceneID="m5j-0l-A3S">
             <objects>
                 <viewController storyboardIdentifier="CollectionViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="kFW-J9-0F6" customClass="CollectionViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="OkK-Xe-LMH">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dmd-Mg-LlL">
-                                <rect key="frame" x="0.0" y="56" width="414" height="715"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="781"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="FRV-jk-Gub">
                                     <size key="itemSize" width="128" height="128"/>
@@ -60,7 +63,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <activityIndicatorView key="backgroundView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" id="KwP-jd-Ohd">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="715"/>
+                                    <rect key="frame" x="0.0" y="-44" width="414" height="781"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="color" systemColor="systemBlueColor"/>
                                 </activityIndicatorView>
@@ -89,7 +92,7 @@
                                 </connections>
                             </collectionView>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="D8U-0O-2EN">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="56"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                 <items>
                                     <navigationItem title="Virtual Tourist" id="IYa-iy-hKk">
                                         <barButtonItem key="leftBarButtonItem" title="OK" id="Rht-07-96P">
@@ -101,7 +104,7 @@
                                 </items>
                             </navigationBar>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3jB-pH-edM">
-                                <rect key="frame" x="0.0" y="771" width="414" height="49"/>
+                                <rect key="frame" x="0.0" y="825" width="414" height="49"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="LMV-fC-6qn"/>
                                     <barButtonItem title="New Collection" id="yVX-Mv-9ty">
@@ -141,7 +144,25 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yGy-gK-wvr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="295.6521739130435" y="83.705357142857139"/>
+            <point key="canvasLocation" x="1205.7971014492755" y="83.705357142857139"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="FXL-dX-gIN">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="jw9-WD-nE4" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="V4u-rm-AyE">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="epp-fp-bXM"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SZv-eX-A0M" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-500.00000000000006" y="83.705357142857139"/>
         </scene>
     </scenes>
     <resources>

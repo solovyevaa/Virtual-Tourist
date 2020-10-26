@@ -16,6 +16,7 @@ class CollectionViewController: UIViewController {
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    var dataController: DataController!
     var fetchedResultsController: NSFetchedResultsController<CollectionOfPhotos>!
     var pin: Pin!
     
@@ -35,10 +36,9 @@ class CollectionViewController: UIViewController {
     // MARK: UIView
     override func viewDidLoad() {
         super.viewDidLoad()
-        getNewPhotos()
+        //getNewPhotos()
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        setUpFetchedResultsController(appDelegate)
+        setUpFetchedResultsController()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -48,13 +48,12 @@ class CollectionViewController: UIViewController {
         newCollectionButton.isEnabled = false
         okButton.isEnabled = false
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        setUpFetchedResultsController(appDelegate)
+        setUpFetchedResultsController()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        deleteAllPhotos()
+        //deleteAllPhotos()
         fetchedResultsController = nil
     }
 
@@ -113,15 +112,16 @@ extension CollectionViewController: UICollectionViewDelegate, UICollectionViewDa
 extension CollectionViewController: NSFetchedResultsControllerDelegate {
     
     // MARK: Setting up FetchedResultsController
-    fileprivate func setUpFetchedResultsController(_ appDelegate: AppDelegate) {
+    fileprivate func setUpFetchedResultsController() {
         let fetchRequest: NSFetchRequest<CollectionOfPhotos> = CollectionOfPhotos.fetchRequest()
         fetchRequest.sortDescriptors = []
         
         let predicate = NSPredicate(format: "pin == %@", pin!)
         fetchRequest.predicate = predicate
         
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: appDelegate.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
+        print(fetchedResultsController.fetchedObjects)
         
         do {
             try fetchedResultsController.performFetch()
@@ -149,14 +149,14 @@ extension CollectionViewController: NSFetchedResultsControllerDelegate {
     // MARK: Saving photos to Persistent Store
     func savePhotos(data: NSData) {
         DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             
-            let managedContext = appDelegate.persistentContainer.viewContext
+            let managedContext = self.dataController.viewContext
             let entity = NSEntityDescription.entity(forEntityName: "CollectionOfPhotos", in: managedContext)!
             let nPhoto = NSManagedObject(entity: entity, insertInto: managedContext)
             
             nPhoto.setValue(data, forKeyPath: "photo")
             nPhoto.setValue(self.pin, forKeyPath: "pin")
+            print(managedContext)
         
             do {
                 try managedContext.save()
@@ -182,11 +182,10 @@ extension CollectionViewController {
     }
     
     func deletePhoto(photo: CollectionOfPhotos) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        appDelegate.persistentContainer.viewContext.delete(photo)
+        dataController.viewContext.delete(photo)
         
         do {
-            try appDelegate.persistentContainer.viewContext.save()
+            try dataController.viewContext.save()
         } catch {
             fatalError("Cannot delete photos: \(error.localizedDescription)")
         }
