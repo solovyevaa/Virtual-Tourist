@@ -23,13 +23,21 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="Grx-V5-S21"/>
                                 </connections>
                             </mapView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="9pv-cB-4kJ">
+                                <rect key="frame" x="186" y="233" width="43" height="41"/>
+                                <color key="color" systemColor="systemBlueColor"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="9pv-cB-4kJ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="186" id="3eX-lY-iC8"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="9pv-cB-4kJ" secondAttribute="bottom" constant="588" id="Nl8-Sq-dAU"/>
                             <constraint firstAttribute="bottom" secondItem="ACc-nQ-fOm" secondAttribute="bottom" id="Qc9-5C-e6e"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="9pv-cB-4kJ" secondAttribute="trailing" constant="185" id="XQs-1o-h7F"/>
                             <constraint firstItem="ACc-nQ-fOm" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="qJ5-a8-M1J"/>
                             <constraint firstItem="ACc-nQ-fOm" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="sK1-N1-jhF"/>
+                            <constraint firstItem="9pv-cB-4kJ" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="145" id="sPz-iK-Plq"/>
                             <constraint firstItem="ACc-nQ-fOm" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="soG-4R-zig"/>
                         </constraints>
                     </view>
@@ -37,6 +45,7 @@
                         <barButtonItem key="backBarButtonItem" title="OK" id="ydc-Hy-Jgx"/>
                     </navigationItem>
                     <connections>
+                        <outlet property="activityIndicator" destination="9pv-cB-4kJ" id="IZU-1O-jo0"/>
                         <outlet property="mapView" destination="ACc-nQ-fOm" id="7h2-n3-EO2"/>
                         <segue destination="kFW-J9-0F6" kind="show" identifier="segue" id="C7i-0A-lXe"/>
                     </connections>
@@ -54,7 +63,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dmd-Mg-LlL">
-                                <rect key="frame" x="0.0" y="44" width="414" height="781"/>
+                                <rect key="frame" x="0.0" y="232" width="414" height="593"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="FRV-jk-Gub">
                                     <size key="itemSize" width="128" height="128"/>
@@ -63,7 +72,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <activityIndicatorView key="backgroundView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" id="KwP-jd-Ohd">
-                                    <rect key="frame" x="0.0" y="-44" width="414" height="781"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="593"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="color" systemColor="systemBlueColor"/>
                                 </activityIndicatorView>
@@ -115,6 +124,9 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="z3P-Kb-J4L"/>
                                 </items>
                             </toolbar>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="LqD-i0-wmR">
+                                <rect key="frame" x="0.0" y="88" width="414" height="136"/>
+                            </mapView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="jAu-qk-lJW"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -126,18 +138,23 @@
                             <constraint firstItem="3jB-pH-edM" firstAttribute="trailing" secondItem="jAu-qk-lJW" secondAttribute="trailing" id="MMp-J7-5Xy"/>
                             <constraint firstItem="D8U-0O-2EN" firstAttribute="leading" secondItem="OkK-Xe-LMH" secondAttribute="leading" id="T7k-VH-OCD"/>
                             <constraint firstItem="3jB-pH-edM" firstAttribute="leading" secondItem="jAu-qk-lJW" secondAttribute="leading" id="Ywi-4M-fEb"/>
+                            <constraint firstItem="dmd-Mg-LlL" firstAttribute="top" secondItem="LqD-i0-wmR" secondAttribute="bottom" constant="8" symbolic="YES" id="dv1-cj-8X4"/>
                             <constraint firstItem="dmd-Mg-LlL" firstAttribute="trailing" secondItem="jAu-qk-lJW" secondAttribute="trailing" id="emd-fR-23I"/>
                             <constraint firstAttribute="bottom" secondItem="3jB-pH-edM" secondAttribute="bottom" constant="22" id="k2z-cH-t9G"/>
                             <constraint firstItem="3jB-pH-edM" firstAttribute="trailing" secondItem="jAu-qk-lJW" secondAttribute="trailing" id="kbR-Lf-GcD"/>
                             <constraint firstItem="dmd-Mg-LlL" firstAttribute="leading" secondItem="jAu-qk-lJW" secondAttribute="leading" id="mK3-OA-Be5"/>
-                            <constraint firstItem="dmd-Mg-LlL" firstAttribute="top" secondItem="D8U-0O-2EN" secondAttribute="bottom" id="odp-gd-4ob"/>
+                            <constraint firstItem="dmd-Mg-LlL" firstAttribute="top" secondItem="D8U-0O-2EN" secondAttribute="bottom" constant="188" id="odp-gd-4ob"/>
                             <constraint firstItem="3jB-pH-edM" firstAttribute="leading" secondItem="jAu-qk-lJW" secondAttribute="leading" id="onH-zQ-K1n"/>
+                            <constraint firstItem="LqD-i0-wmR" firstAttribute="top" secondItem="jAu-qk-lJW" secondAttribute="top" id="wld-4c-kXl"/>
+                            <constraint firstItem="LqD-i0-wmR" firstAttribute="trailing" secondItem="jAu-qk-lJW" secondAttribute="trailing" id="xAK-2q-e3R"/>
+                            <constraint firstItem="LqD-i0-wmR" firstAttribute="leading" secondItem="jAu-qk-lJW" secondAttribute="leading" id="zu4-iK-UdX"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="NYb-m6-0sP"/>
                     <connections>
                         <outlet property="activityIndicator" destination="KwP-jd-Ohd" id="E70-yy-rW4"/>
                         <outlet property="collectionView" destination="dmd-Mg-LlL" id="8D4-QZ-yHM"/>
+                        <outlet property="mapView" destination="LqD-i0-wmR" id="xvZ-tB-oGH"/>
                         <outlet property="newCollectionButton" destination="yVX-Mv-9ty" id="Zwk-bX-sZc"/>
                         <outlet property="okButton" destination="Rht-07-96P" id="McN-pB-8tc"/>
                     </connections>

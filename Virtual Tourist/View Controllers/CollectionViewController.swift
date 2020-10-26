@@ -16,6 +16,7 @@ class CollectionViewController: UIViewController {
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var mapView: MKMapView!
     var dataController: DataController!
     var collectionOfPhotos: [NSData] = []
     var fetchedResultsController: NSFetchedResultsController<CollectionOfPhotos>!
@@ -53,6 +54,14 @@ class CollectionViewController: UIViewController {
         okButton.isEnabled = false
         
         setUpFetchedResultsController()
+        
+        locationManager(latitude: pin.latitude, longitude: pin.longitude)
+        
+        // Adding Annotation
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        mapView.addAnnotation(annotation)
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -224,6 +233,34 @@ extension CollectionViewController {
         okButton.isEnabled = true
         activityIndicator.stopAnimating()
         activityIndicator.isHidden = true
+    }
+    
+}
+
+
+// MARK: Map View
+extension CollectionViewController: MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            let reuseId = "pin"
+            var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+
+            if pinView == nil {
+                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+                pinView!.pinTintColor = .red
+            }
+            else {
+                pinView!.annotation = annotation
+            }
+            
+            return pinView
+        }
+    
+    
+    func locationManager(latitude: Double, longitude: Double) {
+        let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        self.mapView.setRegion(region, animated: true)
     }
     
 }

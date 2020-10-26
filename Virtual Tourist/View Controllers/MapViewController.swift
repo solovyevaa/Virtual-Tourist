@@ -13,6 +13,7 @@ class MapViewController: UIViewController {
 
     // MARK: Initializing of variables
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var dataController: DataController!
     var pins: [Pin] = []
     var photosForPin: [NSData] = []
@@ -31,7 +32,15 @@ class MapViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        activityIndicator.stopAnimating()
+        
         setUpPinFetchRequest()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        photosForPin = []
+        mapView.setRegion(MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 55.6571, longitude: 12.5938), span: MKCoordinateSpan(latitudeDelta: 7.5, longitudeDelta: 7.5)), animated: true)
     }
 
 }
@@ -59,6 +68,8 @@ extension MapViewController: MKMapViewDelegate {
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             mapView.addAnnotation(annotation)
+            
+            self.locationManager(latitude: latitude, longitude: longitude)
         }
     }
 
@@ -79,6 +90,8 @@ extension MapViewController: MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        self.activityIndicator.startAnimating()
+        
         let annotation = mapView.selectedAnnotations[0]
         let latitude = annotation.coordinate.latitude
         let longitude = annotation.coordinate.longitude
@@ -93,11 +106,10 @@ extension MapViewController: MKMapViewDelegate {
     }
     
     
-    func centerMapOnLocation(location: CLLocation) {
-        let regionRadius: CLLocationDistance = 1000
-        
-        let coordinateRegion = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: regionRadius * 2.0, longitudinalMeters: regionRadius * 2.0)
-        mapView.setRegion(coordinateRegion, animated: true)
+    func locationManager(latitude: Double, longitude: Double) {
+        let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        self.mapView.setRegion(region, animated: true)
     }
     
 }
@@ -173,7 +185,6 @@ extension MapViewController {
             vc.pin = (sender as! Pin)
             vc.dataController = dataController
             vc.collectionOfPhotos = photosForPin
-            photosForPin = []
         }
     }
     
