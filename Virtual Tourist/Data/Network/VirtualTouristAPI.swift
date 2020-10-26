@@ -20,14 +20,15 @@ class VirtualTouristAPI {
         static let lat = "&lat="
         static let lon = "&lon="
         static let perPage = "&per_page="
+        static let page = "&page="
         
-        case searchPhotos(latitude: Double, longitude: Double, perPage: String)
+        case searchPhotos(latitude: Double, longitude: Double, perPage: String, page: String)
         
         var stringValue: String {
             switch self {
-            case .searchPhotos(latitude: let latitude, longitude: let longitude, perPage: let perPage):
+            case .searchPhotos(latitude: let latitude, longitude: let longitude, perPage: let perPage, page: let page):
                 let coordinates = Endpoints.lat + String(latitude) + Endpoints.lon + String(longitude)
-                return Endpoints.base + Endpoints.method + Endpoints.apiKeyParam + coordinates + Endpoints.perPage + perPage + "&format=json&nojsoncallback=1"
+                return Endpoints.base + Endpoints.method + Endpoints.apiKeyParam + coordinates + Endpoints.perPage + perPage + Endpoints.page + page + "&format=json&nojsoncallback=1"
             }
         }
         
@@ -74,7 +75,7 @@ class VirtualTouristAPI {
     // MARK: Getting photos from Flickr
     class func getPhotos(latitude: CLLocationDegrees, longitude: CLLocationDegrees, completion: @escaping (Data?, Error?) -> Void, ifNoPhotosDo: ((() -> Void))?) {
         
-        let url = Endpoints.searchPhotos(latitude: latitude, longitude: longitude, perPage: "30").url
+        let url = Endpoints.searchPhotos(latitude: latitude, longitude: longitude, perPage: "30", page: "\(Int.random(in: 0..<6))").url
         print(url)
         
         taskForGETRequest(url: url, responseType: FlickrGetPhotosResponse.self) { (response, error) in
